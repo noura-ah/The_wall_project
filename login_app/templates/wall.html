@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<nav class="navbar navbar-light bg-white justify-content-between w-100">
+    <a class="navbar-brand" href="{% url 'success' %}">CodingDojo wall</a>
+
+    <div class="row" id="navbarNav">
+
+        <p class="text-dark mr-4 mt-2">Welcome {{user.first_name}}</p>
+
+        <a class="text-dark mt-2 mr-4" href="{% url 'logout' %}">Log Out</a>
+
+    </div>
+</nav>
+<div class="container w-50 bg-light pt-1 border">
+    {% if messages %}
+    <div class="messages mt-3  mr-5 w-100">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} p-1 pl-4 ">
+            {% if message.tags %}
+            <div class="">{{ message }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="form-group mb-5">
+        <form action="" method="post">
+            <h3 class="mt-2">Post a massage</h3>
+            {% csrf_token %}
+            <textarea class="form-control" name="message" id="" cols="30" rows="5"
+                style="border-radius:10px"></textarea>
+            <input class='btn btn-info mt-2 float-right mb-5' type="submit" name="btn" id="" value="Post a message">
+        </form>
+    </div>
+    <br>
+
+    {% for message in messages_1 %}
+    <hr>
+    <div class="container mt-4 mb-4">
+        <form action="{% url 'delete' %}" method="post">
+            {% csrf_token %}
+            <label class="font-weight-bold" for="">{{message.user_id.first_name}} {{message.user_id.last_name}} -
+                {{message.created_at}}</label>
+            <div class="d-flex justify-content-between mb-4 bg-white align-items-center" style="border-radius:10px">
+                <p class='ml-4 mt-3' name="" id="">{{message.message}}</p>
+                {% if message.user_id.id == user.id %}
+                <input type="hidden" name="message_delete" value="{{message.id}}" id="">
+                <input type="submit" class="btn btn-light mr-3 p-1 pr-2 pl-2" name="delete" id="" value="Delete">
+                {% endif %}
+            </div>
+
+        </form>
+        {% for comment in message.comments.all|dictsort:'created_at' %}
+        <div class="container ml-3">
+            <form action="{% url 'delete' %}" method="post">
+                {% csrf_token %}
+                <label class="font-weight-bold">{{comment.user_id.first_name}} {{comment.user_id.last_name}} -
+                    {{comment.created_at}}</label>
+                <div class="d-flex justify-content-between mb-4 bg-white align-items-center" style="border-radius:10px">
+                    <p class='ml-4 mt-3' id="">{{comment.comment}}</p>
+                    {% if comment.user_id.id == user.id %}
+                    <input type="hidden" name="comment" value="{{comment.id}}" id="">
+                    <input type="submit" class="btn btn-light mr-3 p-1 pr-2 pl-2" name="delete" id="" value="Delete">
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+        {% endfor %}
+        <div class="container form-group ml-3 mb-4">
+            <form action="" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="message1" value="{{message.id}}" id="">
+                <textarea class="form-control" name="comment" id="" cols="30" rows="2"
+                    style="border-radius:10px"></textarea>
+                <input class='btn btn-info mt-2 float-right' type="submit" name="btn" id="" value="Post a comment">
+            </form>
+        </div>
+        <br>
+    </div>
+
+    {% endfor %}
+</div>
+
+
+{% endblock %}
